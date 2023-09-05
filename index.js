@@ -14,8 +14,9 @@ async function getRegionInfo(regionNumber) {
       responseType: "text",
       resolveBodyOnly: true,
       retry: {
-        limit: 0,
+        limit: 3,
       },
+      
     });
     if (res.error) {
       console.log("Caught error in res.error");
@@ -88,4 +89,4 @@ async function getRegionInfo(regionNumber) {
   }
 }
 
-getRegionInfo(11210);
+getRegionInfo(11209);
