@@ -8,5 +8,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "got": "^13.0.0",
+    "jsdom": "^22.1.0"
+  }
 }
