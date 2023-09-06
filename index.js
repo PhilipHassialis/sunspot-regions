@@ -1,8 +1,9 @@
 import got from "got";
+import { gotScraping } from "got-scraping";
 import { JSDOM } from "jsdom";
 
 const START_REGION = 8124;
-const END_REGION = 13410;
+const END_REGION = 13425;
 
 async function getRegionInfo(regionNumber) {
   const url = `https://www.spaceweatherlive.com/en/solar-activity/region/${regionNumber}.html`;
@@ -10,7 +11,7 @@ async function getRegionInfo(regionNumber) {
   console.log(`Processing ${url}`);
 
   try {
-    const res = await got(url, {
+    const res = await gotScraping(url, {
       responseType: "text",
       resolveBodyOnly: true,
       retry: {
@@ -89,4 +90,4 @@ async function getRegionInfo(regionNumber) {
   }
 }
 
-getRegionInfo(11208);
+getRegionInfo(13425);
