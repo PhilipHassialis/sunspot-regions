@@ -89,4 +89,4 @@ async function getRegionInfo(regionNumber) {
   }
 }
 
-getRegionInfo(11209);
+getRegionInfo(11208);

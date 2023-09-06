@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "got": "^13.0.0",
+    "got-scraping": "^3.2.15",
     "jsdom": "^22.1.0"
   },
   "type": "module"
