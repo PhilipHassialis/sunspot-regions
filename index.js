@@ -10,6 +10,55 @@ const success = chalk.green;
 const info = chalk.blue;
 const warning = chalk.yellow;
 
+function processTop10(regionNumber, tableTop10) {
+  const top10 = [];
+  const initialLine = `${regionNumber},`;
+  tableTop10.querySelectorAll("tr").forEach((row, index) => {
+    let line = initialLine;
+    const columns = row.querySelectorAll("td");
+    columns.forEach((column, index) => {
+      if (index === 0) {
+        line += column.textContent.trim();
+      } else {
+        line += `,${column.textContent.trim()}`;
+      }
+    });
+    if (line !== initialLine) top10.push(line.substring(0, line.length - 1));
+  });
+  return top10;
+}
+
+function processSunspotRegions(regionNumber, tableSunspotRegions) {
+  const sunspotRegions = [];
+  const initialLine = `${regionNumber},`;
+  let line = "";
+
+  tableSunspotRegions.querySelectorAll("tr").forEach((row, index) => {
+    line = initialLine;
+    const columns = row.querySelectorAll("td");
+    if (columns.length === 6) {
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          line += column.textContent.trim();
+        } else {
+          if (column.textContent.trim() === "") {
+            const iClass = column.querySelector("i").className;
+            if (iClass.split(" ").length > 1) {
+              line += `,${iClass.split(" ")[1]}`;
+            } else {
+              line += `,`;
+            }
+          } else {
+            line += `,${column.textContent.trim()}`;
+          }
+        }
+      });
+      sunspotRegions.push(line);
+    }
+  });
+  return sunspotRegions;
+}
+
 async function getRegionInfo(regionNumber) {
   const url = `https://www.spaceweatherlive.com/en/solar-activity/region/${regionNumber}.html`;
 
@@ -36,50 +85,16 @@ async function getRegionInfo(regionNumber) {
 
       const tableSunspotRegions = tables[0];
 
-      const sunspotRegions = [];
-      const top10 = [];
-      const initialLine = `${regionNumber},`;
-      let line = "";
+      let sunspotRegions = [];
+      let top10 = [];
 
-      tableSunspotRegions.querySelectorAll("tr").forEach((row, index) => {
-        line = initialLine;
-        const columns = row.querySelectorAll("td");
-        if (columns.length === 6) {
-          columns.forEach((column, index) => {
-            if (index === 0) {
-              line += column.textContent.trim();
-            } else {
-              if (column.textContent.trim() === "") {
-                const iClass = column.querySelector("i").className;
-                if (iClass.split(" ").length > 1) {
-                  line += `,${iClass.split(" ")[1]}`;
-                } else {
-                  line += `,`;
-                }
-              } else {
-                line += `,${column.textContent.trim()}`;
-              }
-            }
-          });
-          sunspotRegions.push(line);
-        }
-      });
+      sunspotRegions = processSunspotRegions(regionNumber, tableSunspotRegions);
 
       if (tables.length === 4) {
-        const tableTop10 = tables[1];
-        tableTop10.querySelectorAll("tr").forEach((row, index) => {
-          line = initialLine;
-          const columns = row.querySelectorAll("td");
-          columns.forEach((column, index) => {
-            if (index === 0) {
-              line += column.textContent.trim();
-            } else {
-              line += `,${column.textContent.trim()}`;
-            }
-          });
-          if (line !== initialLine)
-            top10.push(line.substring(0, line.length - 1));
-        });
+        if (tables[1]) {
+          console.log(info("Detected secondary table"));
+        }
+        top10 = processTop10(regionNumber, tables[1]);
       }
 
       console.log(sunspotRegions);
@@ -90,9 +105,9 @@ async function getRegionInfo(regionNumber) {
 
       console.log(success(`Processed ${url}`));
     }
-  } catch (error) {
-    console.log(error("Caught error in catch"), error);
+  } catch (err) {
+    console.log(error("Caught error in catch"), err);
   }
 }
 
-getRegionInfo(13425);
+getRegionInfo(11210);
