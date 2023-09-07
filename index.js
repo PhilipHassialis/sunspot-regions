@@ -1,9 +1,12 @@
+import fs from "fs";
 import chalk from "chalk";
 import { gotScraping } from "got-scraping";
 import { JSDOM } from "jsdom";
 
 const START_REGION = 8124;
 const END_REGION = 13425;
+const SUNSPOT_REGIONS_FILE = "sunspot-regions.csv";
+const TOP10_FILE = "top10.csv";
 
 const error = chalk.red;
 const success = chalk.green;
@@ -59,6 +62,14 @@ function processSunspotRegions(regionNumber, tableSunspotRegions) {
   return sunspotRegions;
 }
 
+function writeToFile(sunspotRegions, top10) {
+  fs.appendFileSync(SUNSPOT_REGIONS_FILE, sunspotRegions.join("\n"));
+
+  if (top10.length) {
+    fs.appendFileSync(TOP10_FILE, top10.join("\n"));
+  }
+}
+
 async function getRegionInfo(regionNumber) {
   const url = `https://www.spaceweatherlive.com/en/solar-activity/region/${regionNumber}.html`;
 
@@ -102,6 +113,8 @@ async function getRegionInfo(regionNumber) {
       if (top10.length) {
         console.log(top10);
       }
+
+      writeToFile(sunspotRegions, top10);
 
       console.log(success(`Processed ${url}`));
     }
