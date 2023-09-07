@@ -70,6 +70,17 @@ function writeToFile(sunspotRegions, top10) {
   }
 }
 
+function initFiles() {
+  fs.writeFileSync(
+    SUNSPOT_REGIONS_FILE,
+    "Regiom,Date,Sunspots,Size,Class Magnitude,Class Spot,Location\n"
+  );
+  fs.writeFileSync(
+    TOP10_FILE,
+    "Region,Redion Top 10 Id,Date,Start,Maximum,End\n"
+  );
+}
+
 async function getRegionInfo(regionNumber) {
   const url = `https://www.spaceweatherlive.com/en/solar-activity/region/${regionNumber}.html`;
 
@@ -123,4 +134,5 @@ async function getRegionInfo(regionNumber) {
   }
 }
 
+initFiles();
 getRegionInfo(11210);
