@@ -119,12 +119,6 @@ async function getRegionInfo(regionNumber) {
         top10 = processTop10(regionNumber, tables[1]);
       }
 
-      console.log(sunspotRegions);
-
-      if (top10.length) {
-        console.log(top10);
-      }
-
       writeToFile(sunspotRegions, top10);
 
       console.log(success(`Processed ${url}`));
@@ -134,5 +128,15 @@ async function getRegionInfo(regionNumber) {
   }
 }
 
+async function processRegions() {
+  for (
+    let regionNumber = START_REGION;
+    regionNumber <= END_REGION;
+    regionNumber++
+  ) {
+    await getRegionInfo(regionNumber);
+  }
+}
+
 initFiles();
-getRegionInfo(11210);
+processRegions();
