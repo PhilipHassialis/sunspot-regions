@@ -64,9 +64,11 @@ function processSunspotRegions(regionNumber, tableSunspotRegions) {
 }
 
 function writeToFile(sunspotRegions, top10) {
+  fs.appendFileSync(SUNSPOT_REGIONS_FILE, "\n");
   fs.appendFileSync(SUNSPOT_REGIONS_FILE, sunspotRegions.join("\n"));
 
   if (top10.length) {
+    fs.appendFileSync(TOP10_FILE, "\n");
     fs.appendFileSync(TOP10_FILE, top10.join("\n"));
   }
 }
@@ -78,11 +80,11 @@ function logError(errorURL) {
 function initFiles() {
   fs.writeFileSync(
     SUNSPOT_REGIONS_FILE,
-    "Regiom,Date,Sunspots,Size,Class Magnitude,Class Spot,Location\n"
+    "Regiom,Date,Sunspots,Size,Class Magnitude,Class Spot,Location"
   );
   fs.writeFileSync(
     TOP10_FILE,
-    "Region,Redion Top 10 Id,Date,Start,Maximum,End\n"
+    "Region,Redion Top 10 Id,Date,Start,Maximum,End"
   );
 }
 
