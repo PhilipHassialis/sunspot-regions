@@ -7,6 +7,7 @@ const START_REGION = 8124;
 const END_REGION = 13425;
 const SUNSPOT_REGIONS_FILE = "sunspot-regions.csv";
 const TOP10_FILE = "top10.csv";
+const ERROR_FILE = "errors.txt";
 
 const error = chalk.red;
 const success = chalk.green;
@@ -70,6 +71,10 @@ function writeToFile(sunspotRegions, top10) {
   }
 }
 
+function logError(errorURL) {
+  fs.appendFileSync(ERROR_FILE, `Couldn't process ${errorURL}\n`);
+}
+
 function initFiles() {
   fs.writeFileSync(
     SUNSPOT_REGIONS_FILE,
@@ -81,10 +86,10 @@ function initFiles() {
   );
 }
 
-async function getRegionInfo(regionNumber) {
+async function getRegionInfo(isVerbose, regionNumber) {
   const url = `https://www.spaceweatherlive.com/en/solar-activity/region/${regionNumber}.html`;
 
-  console.log(info(`Processing ${url}`));
+  if (isVerbose) console.log(info(`Processing ${url}`));
 
   try {
     const res = await gotScraping(url, {
@@ -95,13 +100,14 @@ async function getRegionInfo(regionNumber) {
       },
     });
     if (res.error) {
-      console.log(error("Caught error in res.error"));
+      if (isVerbose) console.log(error("Caught error in res.error"));
     } else {
       const dom = new JSDOM(res);
       const tables = dom.window.document.querySelectorAll(".table-striped");
 
       if (tables.length < 3) {
-        console.log(warning("Unexpected page format"));
+        logError(url);
+        if (isVerbose) console.log(warning("Unexpected page format"));
         return;
       }
 
@@ -114,27 +120,29 @@ async function getRegionInfo(regionNumber) {
 
       if (tables.length === 4) {
         if (tables[1]) {
-          console.log(info("Detected secondary table"));
+          if (isVerbose) console.log(info("Detected secondary table"));
         }
         top10 = processTop10(regionNumber, tables[1]);
       }
 
       writeToFile(sunspotRegions, top10);
 
-      console.log(success(`Processed ${url}`));
+      if (isVerbose) console.log(success(`Processed ${url}`));
     }
   } catch (err) {
-    console.log(error("Caught error in catch"), err);
+    if (isVerbose) console.log(error("Caught error in catch"), err);
   }
 }
 
 async function processRegions() {
+  const isVerbose = process.argv[2] === "--verbose";
+
   for (
     let regionNumber = START_REGION;
     regionNumber <= END_REGION;
     regionNumber++
   ) {
-    await getRegionInfo(regionNumber);
+    await getRegionInfo(isVerbose, regionNumber);
   }
 }
 
