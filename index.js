@@ -1,14 +1,19 @@
-import got from "got";
+import chalk from "chalk";
 import { gotScraping } from "got-scraping";
 import { JSDOM } from "jsdom";
 
 const START_REGION = 8124;
 const END_REGION = 13425;
 
+const error = chalk.red;
+const success = chalk.green;
+const info = chalk.blue;
+const warning = chalk.yellow;
+
 async function getRegionInfo(regionNumber) {
   const url = `https://www.spaceweatherlive.com/en/solar-activity/region/${regionNumber}.html`;
 
-  console.log(`Processing ${url}`);
+  console.log(info(`Processing ${url}`));
 
   try {
     const res = await gotScraping(url, {
@@ -17,18 +22,16 @@ async function getRegionInfo(regionNumber) {
       retry: {
         limit: 3,
       },
-      
     });
     if (res.error) {
-      console.log("Caught error in res.error");
+      console.log(error("Caught error in res.error"));
     } else {
       const dom = new JSDOM(res);
       const tables = dom.window.document.querySelectorAll(".table-striped");
 
-      console.log(tables.length);
-
       if (tables.length < 3) {
-        throw new Error("Unexpected page format");
+        console.log(warning("Unexpected page format"));
+        return;
       }
 
       const tableSunspotRegions = tables[0];
@@ -84,9 +87,11 @@ async function getRegionInfo(regionNumber) {
       if (top10.length) {
         console.log(top10);
       }
+
+      console.log(success(`Processed ${url}`));
     }
   } catch (error) {
-    console.log("Caught error in catch", error);
+    console.log(error("Caught error in catch"), error);
   }
 }
 
